@@ -1,3 +1,4 @@
+// models/User.js
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -15,14 +16,14 @@ const userSchema = new mongoose.Schema(
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: {
         type: [Number],
-        default: [0, 0], // Default to empty array if no coordinates are provided
+        default: [0, 0], // [longitude, latitude] - Default to zero coordinates
       },
     },
   },
   { timestamps: true }
 );
 
-// Adding geospatial index for location
+// Adding geospatial index for querying users by location
 userSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("User", userSchema);

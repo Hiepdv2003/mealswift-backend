@@ -1,3 +1,4 @@
+// models/Restaurant.js
 const mongoose = require("mongoose");
 
 const restaurantSchema = new mongoose.Schema(
@@ -22,7 +23,7 @@ const restaurantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Adding geospatial index for location
+// Adding geospatial index for querying restaurants by location
 restaurantSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("Restaurant", restaurantSchema);

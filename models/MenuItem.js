@@ -1,3 +1,4 @@
+// models/MenuItem.js
 const mongoose = require("mongoose");
 
 const menuItemSchema = new mongoose.Schema(
@@ -9,15 +10,15 @@ const menuItemSchema = new mongoose.Schema(
     },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category", // Reference to Category model
-      required: true, // Ensure every item is tied to a category
+      ref: "Category",
+      required: true, // Every item tied to a category
     },
     name: { type: String, required: true },
     description: { type: String },
     price: { type: Number, required: true },
-    currency: { type: String, default: "USD" },
-    imageUrl: { type: String },
-    available: { type: Boolean, default: true },
+    currency: { type: String, default: "USD" }, // Default currency
+    imageUrl: { type: String }, // Optional image URL
+    available: { type: Boolean, default: true }, // Availability status
   },
   { timestamps: true }
 );

@@ -42,25 +42,31 @@ const updateUser = async (req, res) => {
   const { email, name, role } = req.body;
 
   try {
-    const user = await User.findById(id);
+    const updates = {}; // Create an object to hold the updates
+
+    // Update user in Firebase Authentication if email is changed
+    if (email) updates.email = email;
+    if (name) updates.name = name;
+    if (role) updates.role = role;
+
+    // Update user document in MongoDB using findByIdAndUpdate
+    const user = await User.findByIdAndUpdate(id, updates, { new: true });
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update user in Firebase Authentication if email is changed
+    // Update Firebase Authentication if email has changed
     if (email && email !== user.email) {
-      await admin.auth().updateUser(id, { email });
+      await admin.auth().updateUser(user.firebaseUid, { email });
       user.email = email; // Update local user document as well
     }
 
-    // Update user document in MongoDB
-    if (name) user.name = name;
+    // Update role in Firebase
     if (role) {
-      user.role = role;
-      await admin.auth().setCustomUserClaims(id, { role }); // Update role in Firebase
+      await admin.auth().setCustomUserClaims(user.firebaseUid, { role });
     }
 
-    await user.save();
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     handleError(res, error, "Error updating user");
@@ -72,16 +78,16 @@ const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // First delete from Firebase Authentication
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Delete user from Firebase Authentication
-    await admin.auth().deleteUser(id);
+    await admin.auth().deleteUser(user.firebaseUid); // Use firebaseUid here
 
-    // Delete user document from MongoDB
-    await User.deleteOne({ _id: id });
+    // Now delete from MongoDB using findByIdAndDelete
+    await User.findByIdAndDelete(id);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     handleError(res, error, "Error deleting user");

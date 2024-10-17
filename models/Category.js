@@ -1,16 +1,17 @@
+// models/Category.js
 const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true }, // E.g., 'Beverages', 'Appetizers', etc.
-    description: { type: String }, // Optional description for the category
+    name: { type: String, required: true, unique: true }, // Unique category name
+    description: { type: String }, // Optional category description
     restaurantId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Restaurant",
-      required: true, // Ensure categories are tied to specific restaurants
+      required: true, // Category tied to a specific restaurant
     },
-    imageUrl: { type: String }, // Optional image representing the category
-    isActive: { type: Boolean, default: true }, // Toggle to activate/deactivate a category
+    imageUrl: { type: String }, // Optional image for the category
+    isActive: { type: Boolean, default: true }, // Active status for the category
   },
   { timestamps: true }
 );
