@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const admin = require("../config/firebaseConfig");
+const { admin } = require("../config/firebaseConfig");
 
 // Centralized error handling function
 const handleError = (res, error, message, statusCode = 500) => {
@@ -43,27 +43,26 @@ const signUp = async (req, res) => {
 };
 
 // Login a user
-const login = async (req, res) => {
-  const { email, password } = req.body;
+// const login = async (req, res) => {
+//   const { email, password } = req.body;
 
-  // Basic validation
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
+//   // Basic validation
+//   if (!email || !password) {
+//     return res.status(400).json({ message: "Email and password are required" });
+//   }
 
-  try {
-    // Sign in the user with Firebase
-    const userRecord = await admin.auth().getUserByEmail(email);
-    // If successful, create a custom token to return to the client
-    const customToken = await admin.auth().createCustomToken(userRecord.uid);
+//   try {
+//     // Sign in the user with Firebase
+//     const userRecord = await admin.auth().getUserByEmail(email);
+//     // If successful, create a custom token to return to the client
+//     const customToken = await admin.auth().createCustomToken(userRecord.uid);
 
-    res.status(200).json({ message: "Login successful", token: customToken });
-  } catch (error) {
-    handleError(res, error, "Error logging in user");
-  }
-};
+//     res.status(200).json({ message: "Login successful", token: customToken });
+//   } catch (error) {
+//     handleError(res, error, "Error logging in user");
+//   }
+// };
 
 module.exports = {
   signUp,
-  login,
 };

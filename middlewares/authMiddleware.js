@@ -1,4 +1,4 @@
-const admin = require("../config/firebaseConfig");
+const { admin } = require("../config/firebaseConfig");
 
 // Middleware for authentication
 const authenticate = async (req, res, next) => {
@@ -11,10 +11,10 @@ const authenticate = async (req, res, next) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken; // Attach the decoded token to req.user
+    req.user = decodedToken;
     next();
   } catch (error) {
-    console.error("Authentication error:", error); // Log the error for debugging
+    console.error("Authentication error:", error);
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };

@@ -1,5 +1,6 @@
 const User = require("../models/User");
-const admin = require("../config/firebaseConfig");
+const { admin } = require("../config/firebaseConfig");
+const USER_ROLES = require("../utils/constants");
 //const handleError = require("../services/handleError");
 
 // Centralized error handling function
@@ -21,53 +22,70 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Get a single user by ID
-const getUserById = async (req, res) => {
-  const { id } = req.params;
-
+// Get the profile of the authenticated user
+const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    // Check if user information is available in the request
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: "User not authenticated" });
     }
-    res.status(200).json(user);
+
+    // Find the user in MongoDB by their Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user.uid });
+
+    if (!user) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+
+    // Return the user's profile excluding sensitive information
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      imageUrl: user.imageUrl,
+    });
   } catch (error) {
-    handleError(res, error, "Error fetching user");
+    handleError(res, error, "Error fetching user profile");
   }
 };
 
 // Update a user
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { email, name, role } = req.body;
+  const { email, name, role, imageUrl } = req.body;
 
   try {
-    const updates = {}; // Create an object to hold the updates
-
-    // Update user in Firebase Authentication if email is changed
-    if (email) updates.email = email;
-    if (name) updates.name = name;
-    if (role) updates.role = role;
-
-    // Update user document in MongoDB using findByIdAndUpdate
-    const user = await User.findByIdAndUpdate(id, updates, { new: true });
-
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update Firebase Authentication if email has changed
+    // Update Firebase Authentication only if email or role has changed
     if (email && email !== user.email) {
       await admin.auth().updateUser(user.firebaseUid, { email });
-      user.email = email; // Update local user document as well
+      user.email = email; // Update the local user instance
     }
 
-    // Update role in Firebase
-    if (role) {
+    if (role && role !== user.role) {
       await admin.auth().setCustomUserClaims(user.firebaseUid, { role });
+      user.role = role; // Update the local user instance
     }
 
-    res.status(200).json({ message: "User updated successfully", user });
+    // Update MongoDB in one call if there are changes
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (email) updatedFields.email = email;
+    if (role) updatedFields.role = role;
+    if (imageUrl) updatedFields.imageUrl = imageUrl;
+
+    const updatedUser = await User.findByIdAndUpdate(id, updatedFields, {
+      new: true,
+    });
+
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     handleError(res, error, "Error updating user");
   }
@@ -94,9 +112,14 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getRoles = (req, res) => {
+  res.json(USER_ROLES);
+};
+
 module.exports = {
   getAllUsers,
-  getUserById,
+  getUserProfile,
   updateUser,
   deleteUser,
+  getRoles,
 };

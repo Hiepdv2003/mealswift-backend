@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
         default: [0, 0], // [longitude, latitude] - Default to zero coordinates
       },
     },
+    imageUrl: { type: String },
   },
   { timestamps: true }
 );
