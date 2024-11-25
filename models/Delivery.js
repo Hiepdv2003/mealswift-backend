@@ -16,7 +16,11 @@ const deliverySchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["Pending", "Picked Up", "In Transit", "Delivered", "Cancelled"],
-      default: "Pending", // Initial status
+      default: "Pending",
+    },
+    location: {
+      type: { type: String, enum: ["Point"], default: "Point" },
+      coordinates: { type: [Number], default: [0, 0] },
     },
     pickupTime: { type: Date }, // When the order is picked up
     estimatedDeliveryTime: { type: Date }, // Estimated delivery time

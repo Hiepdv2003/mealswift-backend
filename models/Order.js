@@ -18,7 +18,16 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "In Progress", "Completed", "Cancelled"],
       default: "Pending", // Default order status
     },
-    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "MenuItem" }],
+    items: [
+      {
+        menuItemId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "MenuItem",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+      },
+    ],
     totalAmount: { type: Number, required: true },
     currency: { type: String, default: "USD" },
     deliveryAddress: { type: String, required: true },

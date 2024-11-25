@@ -53,7 +53,7 @@ const getUserProfile = async (req, res) => {
 // Update a user
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { email, name, role, imageUrl } = req.body;
+  const { email, name, role, imageUrl, phone_number } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -78,6 +78,7 @@ const updateUser = async (req, res) => {
     if (email) updatedFields.email = email;
     if (role) updatedFields.role = role;
     if (imageUrl) updatedFields.imageUrl = imageUrl;
+    if (phone_number) updatedFields.phone_number = phone_number;
 
     const updatedUser = await User.findByIdAndUpdate(id, updatedFields, {
       new: true,

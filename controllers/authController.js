@@ -12,7 +12,7 @@ const handleError = (res, error, message, statusCode = 500) => {
 
 // Create a new user
 const signUp = async (req, res) => {
-  const { email, password, name, role = "customer" } = req.body;
+  const { email, password, name, phone_number, role } = req.body;
 
   try {
     const userRecord = await admin.auth().createUser({
@@ -29,8 +29,9 @@ const signUp = async (req, res) => {
       firebaseUid: userRecord.uid,
       email: userRecord.email,
       name,
+      phone_number,
       role,
-      location: { type: "Point", coordinates: [0, 0] }, // Empty array as default
+      location: { type: "Point", coordinates: [0, 0] },
     });
     await newUser.save();
 
@@ -41,27 +42,6 @@ const signUp = async (req, res) => {
     handleError(res, error, "Error creating user");
   }
 };
-
-// Login a user
-// const login = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   // Basic validation
-//   if (!email || !password) {
-//     return res.status(400).json({ message: "Email and password are required" });
-//   }
-
-//   try {
-//     // Sign in the user with Firebase
-//     const userRecord = await admin.auth().getUserByEmail(email);
-//     // If successful, create a custom token to return to the client
-//     const customToken = await admin.auth().createCustomToken(userRecord.uid);
-
-//     res.status(200).json({ message: "Login successful", token: customToken });
-//   } catch (error) {
-//     handleError(res, error, "Error logging in user");
-//   }
-// };
 
 module.exports = {
   signUp,

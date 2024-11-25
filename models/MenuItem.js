@@ -16,8 +16,8 @@ const menuItemSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: { type: String },
     price: { type: Number, required: true },
-    currency: { type: String, default: "USD" }, // Default currency
-    imageUrl: { type: String }, // Optional image URL
+    currency: { type: String, default: "USD" },
+    imageUrl: { type: String },
     available: { type: Boolean, default: true }, // Availability status
   },
   { timestamps: true }

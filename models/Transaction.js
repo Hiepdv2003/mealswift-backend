@@ -8,19 +8,24 @@ const transactionSchema = new mongoose.Schema(
       ref: "Order",
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     amount: { type: Number, required: true },
-    currency: { type: String, default: "USD" }, // Default currency
+    currency: { type: String, default: "USD" },
     paymentMethod: {
       type: String,
-      enum: ["Credit Card", "PayPal", "Stripe"], // Supported payment methods
+      enum: ["Credit Card", "PayPal", "Stripe"],
       required: true,
     },
     status: {
       type: String,
       enum: ["Pending", "Completed", "Failed"],
-      default: "Pending", // Initial status
+      default: "Pending",
     },
-    transactionId: { type: String }, // Transaction ID from third-party
+    transactionId: { type: String, unique: true },
     paymentGatewayResponse: { type: Object }, // Response from the payment gateway
   },
   { timestamps: true }
